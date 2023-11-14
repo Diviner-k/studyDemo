@@ -470,3 +470,46 @@ fn1.myCall(p, 1, 2); // 小北19 [ 1, 2 ]
 
 // const fn2 = fn1.myBind(p);
 // fn2([1, 2]);
+
+// 一维数组 => 转树结构
+
+var arr = [];
+arr.push({ id: -1, parentId: null, name: "root" });
+for (let i = 0; i < 100; i++) {
+  arr.push({ id: i, parentId: i % 10 != i ? i % 10 : -1, name: "name" + i });
+}
+
+function buildTree(nodes) {
+  const tree = [];
+  const nodeMap = {};
+
+  // 将节点映射到其唯一标识符
+  nodes.forEach((node) => {
+    nodeMap[node.id] = { ...node, children: [] };
+  });
+
+  // 构建树结构
+  nodes.forEach((node) => {
+    const currentNode = nodeMap[node.id];
+    if (node.parentId !== null) {
+      // 如果有父节点，将当前节点添加到父节点的children数组中
+      const parentNode = nodeMap[node.parentId];
+      if (parentNode) {
+        parentNode.children.push(currentNode);
+      } else {
+        // 处理无效的父节点引用
+        console.error(
+          `Node with id ${node.id} references non-existent parent with id ${node.parentId}`
+        );
+      }
+    } else {
+      // 如果没有父节点，说明是根节点，将其添加到树的顶层
+      tree.push(currentNode);
+    }
+  });
+
+  return tree;
+}
+
+const tree = buildTree(arr);
+console.log(tree);
